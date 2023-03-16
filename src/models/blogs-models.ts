@@ -12,6 +12,7 @@ export const blogsModels = (blogs: any): any => {
             isMembership: blog.isMembership
         }
     }
+
     if (Array.isArray(blogs.items)) {
         return {...blogs, items: blogs.items.map((bl: BlogType) => blogConverter(bl))}
     }

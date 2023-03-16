@@ -1,10 +1,10 @@
 import {Request, Response, Router} from "express";
 import {HTTP_STATUSES} from "../http_statuses";
-import {postsControl} from "../repositories/repository-posts";
 import {checkPostId, postValidations} from "../validator/validators";
 import {inputValidationMiddleware} from "../middleware/input-validation-middleware";
 import {authorizationGuard} from "../middleware/authorization-guard";
 import {postModels} from "../models/post-models";
+import {servicePost} from "../services/service-post";
 
 
 
@@ -12,11 +12,11 @@ export const postsRouter = Router({})
 
 //-------------------GET---------------//
 postsRouter.get('/', async (req: Request, res: Response) => {
-    const posts = await postsControl.getAllPosts()
+    const posts = await servicePost.getAllPosts()
     res.status(HTTP_STATUSES.OK200).send(postModels(posts))
 })
 postsRouter.get('/:id', async (req: Request, res: Response) => {
-    const findPost = await postsControl.getPostById(req.params.id)
+    const findPost = await servicePost.getPostById(req.params.id)
     if (findPost) {
         res.status(HTTP_STATUSES.OK200).send(postModels(findPost))
     } else {
@@ -25,12 +25,12 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
 })
 //-------------------POST---------------//
 postsRouter.post('/', authorizationGuard, postValidations, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const newPost = await postsControl.createPost(req.body)
+    const newPost = await servicePost.createPost(req.body)
         res.status(HTTP_STATUSES.CREATED_201).send(postModels(newPost))
 })
 //-------------------PUT---------------//
 postsRouter.put('/:id', authorizationGuard,checkPostId, postValidations, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const isChangePost = await postsControl.changePost(req.params.id, req.body)
+    const isChangePost = await servicePost.changePost(req.params.id, req.body)
     if (isChangePost) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT)
     } else {
@@ -39,7 +39,7 @@ postsRouter.put('/:id', authorizationGuard,checkPostId, postValidations, inputVa
 })
 //-------------------DELETE---------------//
 postsRouter.delete('/:id', authorizationGuard, async (req: Request, res: Response) => {
-    const isDeleted = await postsControl.deletePost(req.params.id)
+    const isDeleted = await servicePost.deletePost(req.params.id)
     if (isDeleted) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT)
     } else {

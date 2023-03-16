@@ -16,3 +16,18 @@ export type PostType = {
     blogName: string
     createdAt: string
 }
+
+export type QueryForBlogsType = {
+    pageNumber : number
+    pageSize: number
+    sortBy: string
+    sortDirection: string
+    searchNameTerm: string
+}
+
+export type DefaultValueListType = {
+    FIELD_FOR_SORT : string
+    SORT_DIRECTION : string
+    PAGE_NUMBER : number
+    PAGE_SIZE : number
+}

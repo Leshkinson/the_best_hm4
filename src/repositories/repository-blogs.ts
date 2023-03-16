@@ -1,42 +1,30 @@
 import {BlogType} from "../types";
 import {blogCollections} from "../../mongoDB";
 
-export const blogsControl = {
-    async getAllBlogs(filter: any): Promise<any> {
-        return {
-            pagesCount: 0,
-            page: 0,
-            pageSize: 0,
-            totalCount: 0,
-            items: await blogCollections.find(filter).toArray()
-        }
+export const repositoryBlog = {
+    async getAllBlogs(filter: any, sort: any, skip: any, limit: any): Promise<any> {
+        return await blogCollections.find(filter).sort(sort).skip(skip).limit(limit).toArray()
     },
-    async getBlogById(id: string): Promise<BlogType | null> {
-        return blogCollections.findOne({id: id})
+    async getBlogById(id: { id: string }): Promise<BlogType | null> {
+        return blogCollections.findOne(id)
     },
-    async createBlog(body: BlogType): Promise<BlogType> {
-        const newBlog = {
-            id: (+(new Date())).toString(),
-            name: body.name,
-            description: body.description,
-            websiteUrl: body.websiteUrl,
-            createdAt: new Date().toISOString(),
-            isMembership: false
-        }
+    async getTotalCount(filter: any) {
+        return await blogCollections.countDocuments(filter)
+    },
+    async createBlog(newBlog: BlogType): Promise<void> {
         await blogCollections.insertOne(newBlog)
-        return newBlog
     },
-    async changeBlog(id: string, body: BlogType): Promise<boolean> {
-        const {name, description, websiteUrl} = body
-        const result = await blogCollections.updateOne({id: id}, {$set: {name, description, websiteUrl}})
+    async changeBlog(id: { id: string }, updateBLog: { $set: BlogType }): Promise<boolean> {
+        const result = await blogCollections.updateOne(id, updateBLog)
         return result.matchedCount === 1;
 
     },
-    async deleteBlog(id: string) {
-        const result = await blogCollections.deleteOne({id: id})
+    async deleteBlog(id: { id: string }): Promise<boolean> {
+        const result = await blogCollections.deleteOne(id)
         return result.deletedCount === 1
     },
     async deleteAllBlogs() {
         await blogCollections.deleteMany({})
-    }
+    },
+
 }

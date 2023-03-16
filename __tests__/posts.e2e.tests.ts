@@ -1,8 +1,8 @@
 import {app} from "../setting";
 import {HTTP_STATUSES} from "../src/http_statuses";
 import request from 'supertest'
-import {blogsControl} from "../src/repositories/repository-blogs";
-import {postsControl} from "../src/repositories/repository-posts";
+import {repositoryBlog} from "../src/repositories/repository-blogs";
+import {repositoryPost} from "../src/repositories/repository-posts";
 
 const testNewPost = {
     "title": "123",
@@ -69,7 +69,7 @@ describe('test_posts_path_2', () => {
 
     beforeAll(async () => {
         //@ts-ignore // ошибка типизации выше, изначально создание блога принимает 3 параметра
-        await blogsControl.createBlog({
+        await repositoryBlog.createBlog({
             "name": "somename",
             "websiteUrl": "https://milanac.ru/",
             "description": "description"
@@ -92,7 +92,7 @@ describe('test_posts_path_2', () => {
 
 describe('test_posts_path_3', () => {
     beforeAll(async () => {
-        await postsControl.getAllPosts().then((el) => {
+        await repositoryPost.getAllPosts().then((el) => {
             createdPost = el[0]
         })
     })

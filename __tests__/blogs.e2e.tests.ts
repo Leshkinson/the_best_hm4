@@ -1,7 +1,7 @@
 import request from 'supertest'
 import {app} from "../setting";
 import {HTTP_STATUSES} from "../src/http_statuses";
-import {blogsControl} from "../src/repositories/repository-blogs";
+import {repositoryBlog} from "../src/repositories/repository-blogs";
 
 
 const testBlogData = {
@@ -44,7 +44,7 @@ describe('/test_blogs_path_1', () => {
 
 
     it('PUT, trying to change blog with invalid body', async () => {
-        const arrBlog = await blogsControl.getAllBlogs()
+        const arrBlog = await repositoryBlog.getAllBlogs({})
         const firstElement = await arrBlog[0]
         await request(app)
             .put('/blogs/' + firstElement?.id)
@@ -71,7 +71,7 @@ describe('/test_blogs_path_2', () => {
     let firstElement: any
 
     it('GET, try should return blog by id', async () => {
-        arrBlog = await blogsControl.getAllBlogs()
+        arrBlog = await repositoryBlog.getAllBlogs({})
         firstElement = await arrBlog[0]
         await request(app)
             //@ts-ignore

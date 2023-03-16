@@ -1,21 +1,18 @@
 import {Request, Response, Router} from "express";
 import {HTTP_STATUSES} from "../http_statuses";
-import {blogsControl} from "../repositories/repository-blogs";
 import {blogValidations} from "../validator/validators";
 import {inputValidationMiddleware} from "../middleware/input-validation-middleware";
 import {authorizationGuard} from "../middleware/authorization-guard";
 import {blogsModels} from "../models/blogs-models";
 import {serviceBlog} from "../services/service-blog";
+import {controllerBlog} from "../controllers/controller-blog";
 
 export const blogsRouter = Router({})
 
 //-------------------GET---------------//
-blogsRouter.get('/', async (req: Request, res: Response) => {
-    const blogs = await serviceBlog.getBlogs(req,res)
-    res.status(HTTP_STATUSES.OK200).send(blogsModels(blogs))
-})
+blogsRouter.get('/', controllerBlog.getAllBlogs)
 blogsRouter.get('/:id', async (req: Request, res: Response) => {
-    const findBlog = await blogsControl.getBlogById(req.params.id)
+    const findBlog = await serviceBlog.getBlogById(req.params.id)
     if (findBlog) {
         res.status(HTTP_STATUSES.OK200).send(blogsModels(findBlog))
     } else {
@@ -24,12 +21,12 @@ blogsRouter.get('/:id', async (req: Request, res: Response) => {
 })
 //-------------------POST---------------//
 blogsRouter.post('/', authorizationGuard, blogValidations, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const newBlog = await blogsControl.createBlog(req.body)
+    const newBlog = await serviceBlog.createBlog(req.body)
     res.status(HTTP_STATUSES.CREATED_201).send(blogsModels(newBlog))
 })
 //-------------------PUT---------------//
 blogsRouter.put('/:id', authorizationGuard, blogValidations, inputValidationMiddleware, async (req: Request, res: Response) => {
-    const isChangeBlog = await blogsControl.changeBlog(req.params.id, req.body)
+    const isChangeBlog = await serviceBlog.changeBlog(req.params.id, req.body)
     if (isChangeBlog) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT)
         return
@@ -38,7 +35,7 @@ blogsRouter.put('/:id', authorizationGuard, blogValidations, inputValidationMidd
 })
 //-------------------DELETE---------------//
 blogsRouter.delete('/:id', authorizationGuard, async (req: Request, res: Response) => {
-    const isDeleted = await blogsControl.deleteBlog(req.params.id)
+    const isDeleted = await serviceBlog.deleteBlog(req.params.id)
     if (isDeleted) {
         res.sendStatus(HTTP_STATUSES.NO_CONTENT)
     } else {
