@@ -43,7 +43,7 @@ export const blogController = {
             sortDirection : req.query.sortDirection as string ||  DEFAULT_VALUE_LIST.SORT_DIRECTION
         }
       const posts = await blogService.getAllBlogPosts(req.params.id,query)
-        res.status(HTTP_STATUSES.OK200).send(posts)
+        res.status(HTTP_STATUSES.OK200).send(postModels(posts))
 
     },
 

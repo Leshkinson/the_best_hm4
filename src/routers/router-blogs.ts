@@ -9,7 +9,7 @@ export const blogsRouter = Router({})
 //-------------------GET---------------//
 blogsRouter.get('/', blogController.getAllBlogs)
 blogsRouter.get('/:id', blogController.getBlogById)
-blogsRouter.get('/:id/posts',blogController.getAllBlogPosts)
+blogsRouter.get('/:id/posts',checkBlogId ,blogController.getAllBlogPosts)
 //-------------------POST---------------//
 blogsRouter.post('/', authorizationGuard, blogValidations, inputValidationMiddleware, blogController.createBlog)
 blogsRouter.post('/:id/posts', authorizationGuard, checkBlogId, createPostByBlogValidations, inputValidationMiddleware, blogController.createPostInBlog)
