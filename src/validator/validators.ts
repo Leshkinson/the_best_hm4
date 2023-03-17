@@ -1,7 +1,7 @@
 import {body} from "express-validator";
 import {NextFunction, Request, Response} from "express";
 import {HTTP_STATUSES} from "../http_statuses";
-import {serviceBlog} from "../services/service-blog";
+import {blogService} from "../services/blog-service";
 import {servicePost} from "../services/service-post";
 
 const urlPattern = new RegExp('^https://([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$');
@@ -28,7 +28,7 @@ const blogIdValidation = body('blogId')
     .trim()
     .notEmpty().withMessage('Field must not be empty')
     .custom(async value => {
-     const isHaveBlog = await serviceBlog.getBlogById(value)
+     const isHaveBlog = await blogService.getBlogById(value)
        if(!isHaveBlog) {
             throw new Error();
        }
@@ -61,3 +61,4 @@ const websiteUrlValidation = body('websiteUrl')
 
 export const postValidations = [titleValidation, shortDescriptionValidation, contentValidation, blogIdValidation]
 export const blogValidations = [nameValidation, descriptionValidation, websiteUrlValidation]
+export const createPostByBlogValidations = [titleValidation, shortDescriptionValidation, contentValidation]

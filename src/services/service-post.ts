@@ -1,6 +1,7 @@
 import {repositoryPost} from "../repositories/repository-posts";
-import {DefaultValueListType, PostType} from "../types";
-import {serviceBlog} from "./service-blog";
+import {DefaultValueListType, PostType, QueryForBlogsType} from "../types";
+import {blogService} from "./blog-service";
+import {getSortSkipLimit} from "../utils/getSortSkipLimit";
 
 const DEFAULT_VALUE_LIST: DefaultValueListType = {
     FIELD_FOR_SORT: "createdAt",
@@ -11,15 +12,17 @@ const DEFAULT_VALUE_LIST: DefaultValueListType = {
 
 
 export const servicePost = {
-    async getAllPosts() {
+    async getAllPosts(query: QueryForBlogsType) {
+        const  {pageNumber, pageSize}  = query
         const filter: any = {}
         const totalCount = await repositoryPost.getTotalCount(filter)
+        const [sort, skip, limit ] = await getSortSkipLimit(query)
         return {
-            pagesCount: 0,
-            page: 0,
-            pageSize: 0,
+            pagesCount: Math.ceil(totalCount / +pageSize),
+            page: pageNumber,
+            pageSize: pageSize,
             totalCount,
-            items: await repositoryPost.getAllPosts(filter)
+            items: await repositoryPost.getAllPosts(filter, sort, skip, +limit)
         }
     },
     async getPostById(id: string): Promise<PostType | null> {
@@ -27,7 +30,7 @@ export const servicePost = {
         return await repositoryPost.getPostById(filter)
     },
     async createPost(post: PostType) {
-        const findBlog = await serviceBlog.getBlogById(post.blogId)
+        const findBlog = await blogService.getBlogById(post.blogId)
         const newPost = {
             id: (+(new Date())).toString(),
             title: post.title,
@@ -43,7 +46,7 @@ export const servicePost = {
     },
     async changePost(id:string, post: PostType) {
         const {title, blogId, content, shortDescription} = post
-        const findBlog = await serviceBlog.getBlogById(post.blogId)
+        const findBlog = await blogService.getBlogById(post.blogId)
         const filter = {id}
         const update = {
             $set: {

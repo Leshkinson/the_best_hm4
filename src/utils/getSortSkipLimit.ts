@@ -6,6 +6,6 @@ export const getSortSkipLimit = async (query: QueryForBlogsType) => {
     const sort = {[sortBy]: sortDirection === "asc" ? 1 : -1}
     const pageNumber = query?.pageNumber
     const limit = query?.pageSize
-    const skip = (+pageNumber - 1) * +limit
-    return [sort, limit, skip]
+    const skip: number = (+pageNumber - 1) * +limit
+    return [sort,skip ,limit]
 }

@@ -31,3 +31,9 @@ export type DefaultValueListType = {
     PAGE_NUMBER : number
     PAGE_SIZE : number
 }
+
+export type InitBlogType = {
+    title: string,
+    shortDescription: string,
+    content: string
+}

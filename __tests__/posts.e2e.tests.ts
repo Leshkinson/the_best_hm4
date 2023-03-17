@@ -1,7 +1,7 @@
 import {app} from "../setting";
 import {HTTP_STATUSES} from "../src/http_statuses";
 import request from 'supertest'
-import {repositoryBlog} from "../src/repositories/repository-blogs";
+import {blogRepository} from "../src/repositories/repository-blogs";
 import {repositoryPost} from "../src/repositories/repository-posts";
 
 const testNewPost = {
@@ -69,7 +69,7 @@ describe('test_posts_path_2', () => {
 
     beforeAll(async () => {
         //@ts-ignore // ошибка типизации выше, изначально создание блога принимает 3 параметра
-        await repositoryBlog.createBlog({
+        await blogRepository.createBlog({
             "name": "somename",
             "websiteUrl": "https://milanac.ru/",
             "description": "description"
