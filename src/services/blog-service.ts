@@ -31,7 +31,7 @@ export const blogService = {
         const {pageNumber, pageSize} = query
         const [sort, skip, limit] = await getSortSkipLimit(query)
         const filter: any = {blogId : id}
-        const totalCount = await blogRepository.getTotalCount(filter)
+        const totalCount = await repositoryPost.getTotalCount(filter)
         return {
             pagesCount: Math.ceil(totalCount / +pageSize),
             page: pageNumber,

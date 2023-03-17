@@ -35,6 +35,16 @@ const blogIdValidation = body('blogId')
         return false
     }).withMessage('No blog!')
 
+export const checkBlogId = async (req: Request, res: Response, next: NextFunction) =>{
+    const isHaveBlog = await blogService.getBlogById(req.params.id)
+    if(!isHaveBlog){
+       res.sendStatus(HTTP_STATUSES.NOT_FOUND)
+        return
+    }
+    next()
+}
+
+
 export const checkPostId = async (req: Request, res: Response, next: NextFunction) =>{
     const isHaveId = await servicePost.getPostById(req.params.id)
     isHaveId ? next() :  res.sendStatus(HTTP_STATUSES.NOT_FOUND)

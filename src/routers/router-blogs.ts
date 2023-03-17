@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {blogValidations, createPostByBlogValidations} from "../validator/validators";
+import {blogValidations, checkBlogId, createPostByBlogValidations} from "../validator/validators";
 import {inputValidationMiddleware} from "../middleware/input-validation-middleware";
 import {authorizationGuard} from "../middleware/authorization-guard";
 import {blogController} from "../controllers/blog-controller";
@@ -12,7 +12,7 @@ blogsRouter.get('/:id', blogController.getBlogById)
 blogsRouter.get('/:id/posts',blogController.getAllBlogPosts)
 //-------------------POST---------------//
 blogsRouter.post('/', authorizationGuard, blogValidations, inputValidationMiddleware, blogController.createBlog)
-blogsRouter.post('/:id/posts', authorizationGuard, createPostByBlogValidations, inputValidationMiddleware, blogController.createPostInBlog)
+blogsRouter.post('/:id/posts', authorizationGuard, checkBlogId, createPostByBlogValidations, inputValidationMiddleware, blogController.createPostInBlog)
 //-------------------PUT---------------//
 blogsRouter.put('/:id', authorizationGuard, blogValidations, inputValidationMiddleware, blogController.changeBlog)
 //-------------------DELETE---------------//
