@@ -3,12 +3,30 @@ import {HTTP_STATUSES} from "../src/http_statuses";
 import request from 'supertest'
 import {blogRepository} from "../src/repositories/repository-blogs";
 import {repositoryPost} from "../src/repositories/repository-posts";
+import {servicePost} from "../src/services/service-post";
+import {DefaultValueListType} from "../src/types";
+import {blogController} from "../src/controllers/blog-controller";
+import {blogService} from "../src/services/blog-service";
 
 const testNewPost = {
     "title": "123",
     "shortDescription": "new post",
     "content": "new post",
     "blogId": "2"
+}
+const DEFAULT_VALUE_LIST: DefaultValueListType = {
+    FIELD_FOR_SORT: "createdAt",
+    SORT_DIRECTION: "desc",
+    PAGE_NUMBER: 1,
+    PAGE_SIZE: 10
+}
+
+const query =  {
+    pageNumber :  DEFAULT_VALUE_LIST.PAGE_NUMBER,
+    pageSize :   DEFAULT_VALUE_LIST.PAGE_SIZE,
+    sortBy : DEFAULT_VALUE_LIST.FIELD_FOR_SORT,
+    searchNameTerm :  "",
+    sortDirection :DEFAULT_VALUE_LIST.SORT_DIRECTION
 }
 
 describe('/test_posts_path_1', () => {
@@ -69,7 +87,7 @@ describe('test_posts_path_2', () => {
 
     beforeAll(async () => {
         //@ts-ignore // ошибка типизации выше, изначально создание блога принимает 3 параметра
-        await blogRepository.createBlog({
+        await blogService.createBlog({
             "name": "somename",
             "websiteUrl": "https://milanac.ru/",
             "description": "description"
@@ -77,8 +95,6 @@ describe('test_posts_path_2', () => {
             .then(async (el) => {
                 createdBlog = el
             })
-
-
     })
 
     it('POST, trying to create post', async () => {
@@ -92,13 +108,12 @@ describe('test_posts_path_2', () => {
 
 describe('test_posts_path_3', () => {
     beforeAll(async () => {
-        await repositoryPost.getAllPosts().then((el) => {
-            createdPost = el[0]
+        await servicePost.getAllPosts(query).then((el) => {
+            createdPost = el.items[0]
         })
     })
 
     it('PUT, trying to change post with not valid body', async () => {
-        console.log("createdBlog", createdBlog)
         await request(app)
             .put('/posts/' + createdPost.id)
             .auth('admin', 'qwerty', {type: "basic"})

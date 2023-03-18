@@ -2,13 +2,31 @@ import request from 'supertest'
 import {app} from "../setting";
 import {HTTP_STATUSES} from "../src/http_statuses";
 import {blogRepository} from "../src/repositories/repository-blogs";
+import {DefaultValueListType} from "../src/types";
+import {blogService} from "../src/services/blog-service";
+import {blogsModels} from "../src/models/blogs-models";
 
+const DEFAULT_VALUE_LIST: DefaultValueListType = {
+    FIELD_FOR_SORT: "createdAt",
+    SORT_DIRECTION: "desc",
+    PAGE_NUMBER: 1,
+    PAGE_SIZE: 10
+}
+const query =  {
+    pageNumber :  DEFAULT_VALUE_LIST.PAGE_NUMBER,
+    pageSize :   DEFAULT_VALUE_LIST.PAGE_SIZE,
+    sortBy : DEFAULT_VALUE_LIST.FIELD_FOR_SORT,
+    searchNameTerm :  "",
+    sortDirection :DEFAULT_VALUE_LIST.SORT_DIRECTION
+}
 
 const testBlogData = {
     "name": "CorrectedName",
     "description": "CorrectedName",
     "websiteUrl": "https://corrected-url"
 }
+let firstElement: any
+
 
 describe('/test_blogs_path_1', () => {
 
@@ -19,12 +37,13 @@ describe('/test_blogs_path_1', () => {
     })
 
     it('Post, created blog', async () => {
-        await request(app)
+     const result = await request(app)
             .post('/blogs')
             .auth('admin', 'qwerty', {type: "basic"})
             .send(testBlogData)
             .expect(HTTP_STATUSES.CREATED_201)
 
+        firstElement = result.body
     })
 
     it('Post, created blog no auth user', async () => {
@@ -44,8 +63,9 @@ describe('/test_blogs_path_1', () => {
 
 
     it('PUT, trying to change blog with invalid body', async () => {
-        const arrBlog = await blogRepository.getAllBlogs({})
-        const firstElement = await arrBlog[0]
+
+        const arrBlog = await blogService.getBlogs(query)
+        const firstElement = await arrBlog.items[0]
         await request(app)
             .put('/blogs/' + firstElement?.id)
             .auth('admin', 'qwerty', {type: "basic"})
@@ -67,17 +87,15 @@ describe('/test_blogs_path_1', () => {
 
 })
 describe('/test_blogs_path_2', () => {
-    let arrBlog
-    let firstElement: any
 
     it('GET, try should return blog by id', async () => {
-        arrBlog = await blogRepository.getAllBlogs({})
-        firstElement = await arrBlog[0]
+        // arrBlog = await blogService.getBlogs(query)
+        // firstElement = await arrBlog.items[0]
         await request(app)
             //@ts-ignore
             .get('/blogs/' + firstElement.id)
             //@ts-ignore
-            .expect(HTTP_STATUSES.OK200, {...firstElement, _id: firstElement._id.toString()})
+            .expect(HTTP_STATUSES.OK200, blogsModels({...firstElement}))
     })
 
     it('PUT, success trying to change blog', async () => {
@@ -90,7 +108,6 @@ describe('/test_blogs_path_2', () => {
 
 
     it('DELETE, successful remove blog', async () => {
-        console.log('firstElement.id', firstElement.id)
         await request(app)
             .delete('/blogs/' + firstElement.id)
             .auth('admin', 'qwerty', {type: "basic"})
